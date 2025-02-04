@@ -1,43 +1,29 @@
+import { preprocessImage } from "../utils/sharp.js";
+import { getStructuredData } from "../utils/ai.js";
+import { ocrProcess } from "../utils/ocr.js";
 
-import fs from 'fs'
-import {createWorker} from 'tesseract.js'
 
-export const uploadImages=async(req,res,stack)=>{
-    try {
-console.log(req.files)
+export const uploadImages = async (req, res) => {
+  try {
+    const frontImageBuffer = req.files.frontImage[0].buffer;
+    const backImageBuffer = req.files.backImage[0].buffer;
 
-while (stack.length>0) {
-    let filePath=stack.pop()
-    fs.readFile('./uploads/'+filePath,(err,data)=>{
-        if(err){
-            console.log(err)
-        }else{
-            (
-                async ()=>{
-                    const worker=await createWorker('eng')
-                    const ret=await worker.recognize(data)
-                    console.log(ret.data.text)
+    const frontProcessedImage = await preprocessImage(frontImageBuffer);
+    const backProcessedImage = await preprocessImage(backImageBuffer);
 
-                    await worker.terminate()
+    const frontText = await ocrProcess(frontProcessedImage);
+    const backText = await ocrProcess(backProcessedImage);
 
-                }
-            )()
-
-            fs.unlink('./uploads/'+filePath,(err)=>{
-                if(err){
-                    console.log(err)
-                }else{
-                    console.log("File deleted succesfully")
-                }
-            })
-        }
-    })
-}
-
-res.json({status:true,data:"data reached server"})
-        
-    } catch (error) {
-        
-    }
-}
-
+    const concatText = frontText + "\n" + backText;
+    const result = await getStructuredData(concatText);
+    
+    res.json({
+      status: true,
+      message: "Data processed successfully",
+      result,
+    });
+  } catch (error) {
+    console.error("Error processing images:", error);
+    res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};

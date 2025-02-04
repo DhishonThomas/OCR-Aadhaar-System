@@ -1,0 +1,39 @@
+/ const nameRegex = /^[A-Z ]+$/m;
+// const dobRegex = /\d{2}\/\d{2}\/\d{4}/;
+// const genderRegex = /\b(MALE|FEMALE|OTHER)\b/;
+// const uidRegex = /\d{4} \d{4} \d{4}/;
+// const pincodeRegex = /\b\d{6}\b/;
+
+// // Match details from the front image
+// const name = ret.data.text.match(nameRegex)?.[0] || "Not Found";
+// const dob = ret.data.text.match(dobRegex)?.[0] || "Not Found";
+// const gender = ret.data.text.match(genderRegex)?.[0] || "Not Found";
+// const uidFront = ret.data.text.match(uidRegex)?.[0] || "Not Found";
+
+// // Match details from the back image
+// const uidBack = ret.data.text.match(uidRegex)?.[0] || "Not Found";
+// const pincode = ret.data.text.match(pincodeRegex)?.[0] || "Not Found";
+// const address = ret.data.text.split(uidBack)[1]?.trim() || "Not Found";
+
+// // Check if UID matches on both sides
+// const isUidSame = uidFront === uidBack ? "Yes" : "No";
+
+// // Step 4: Create JSON response
+// const response = {
+//   status: true,
+//   data: {
+//     Name: name,
+//     DOB: dob,
+//     Gender: gender,
+//     UID: uidFront,
+//     address: address,
+//     pincode: pincode,
+//     age_band: "20-30", // Example calculation
+//     maskedMobileNumber: "*******295", // Placeholder
+//     isUidSame: isUidSame,
+//   },
+//   message: "Parsing Successful!",
+// };
+
+
+// console.log(response)

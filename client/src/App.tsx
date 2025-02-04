@@ -38,6 +38,7 @@ if(data?.backImage&&data?.frontImage){
     alert("data reached server succssfully.")
   }
   console.log("responce",response.data)
+  
 }
 
 

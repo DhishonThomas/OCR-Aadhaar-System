@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import AadhaarResponse from "./componets/AadhaarResponse";
 import AadhaarJson from "./componets/AadhaarJson";
+import { ThreeDots } from "react-loader-spinner";
 
 interface ImagePreview {
   frontPrev: string;
@@ -25,7 +26,7 @@ const App = () => {
     status: false,
     message: "",
   });
-  let [loading,setLoading]=useState(false)
+  let [loading, setLoading] = useState(false);
   let [response, setResponse] = useState({
     name: "",
     dob: "",
@@ -35,20 +36,19 @@ const App = () => {
     pincode: "",
   });
   async function sendImages() {
-
     try {
       if (data?.backImage && data?.frontImage) {
         const formData = new FormData();
-  
+
         formData.append("frontImage", data?.frontImage);
         formData.append("backImage", data?.backImage);
-        setLoading(true)
-        setSubmitButton(true)
-        setApiStatus((prev:any)=>({
+        setLoading(true);
+        setSubmitButton(true);
+        setApiStatus((prev: any) => ({
           ...prev,
-          status:false,
-          message:""
-        }))
+          status: false,
+          message: "",
+        }));
         const response = await axios.post(
           "http://localhost:2000/api/upload-images",
           formData,
@@ -58,7 +58,7 @@ const App = () => {
             },
           }
         );
-        let apiData=response.data.result
+        let apiData = response.data.result;
         setResponse((prev: any) => ({
           ...prev,
           name: apiData.name || "Not Found",
@@ -68,7 +68,7 @@ const App = () => {
           address: apiData.address || "Not Found",
           pincode: apiData.pincode || "Not Found",
         }));
-  
+
         setApiStatus((prev: any) => ({
           ...prev,
           status: response.data.status,
@@ -76,14 +76,12 @@ const App = () => {
         }));
         console.log("responce", response.data);
       }
-  
     } catch (error) {
-      console.log(error)
-    }finally{
-      setLoading(false)
-      setSubmitButton(false)
+      console.log(error);
+    } finally {
+      setLoading(false);
+      setSubmitButton(false);
     }
-
   }
 
   const [imagePrev, setImagePrev] = useState<ImagePreview>({
@@ -207,29 +205,39 @@ const App = () => {
         </div>
 
         <div className="flex justify-center font-bold">
-               <button
+          <button
             className={`bg-blue-500 p-2 w-3xl rounded-md ${
               submitButton ? "cursor-not-allowed" : "cursor-pointer"
             }`}
             disabled={submitButton}
             onClick={sendImages}
           >
-            {loading?"Verifying...":"Submit"}
+            {loading ? "Verifying..." : "Submit"}
           </button>
         </div>
       </div>
 
       <div className="w-1/2">
-
-        {(!apiStatus.message&&!loading) && (
+        {!apiStatus.message && !loading && (
           <div className="mt-4 w-full bg-gray-300 h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center ">
             <h2 className="font-bold text-2xl mt-2">Api Response</h2>
             <div className=" max-w-lg bg-gray-900 "></div>
           </div>
         )}
-        {
-          loading&&<div>Loading</div>
-        }
+        {loading && (
+          <div className="flex justify-center items-center mt-10">
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
+          </div>
+        )}
         {apiStatus.status && (
           <AadhaarResponse
             name={response.name}
@@ -245,14 +253,14 @@ const App = () => {
           <AadhaarJson jsonData={JSON.stringify({ response }, null, 2)} />
         )}
 
-        {
-          (apiStatus.message&&!apiStatus.status)&&
+        {apiStatus.message && !apiStatus.status && (
           <div className="mt-4 w-full bg-gray-300 h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center ">
-          <h2 className="font-bold text-2xl mt-2 text-red-700">{apiStatus.message}</h2>
-          <div className=" max-w-lg bg-gray-900 "></div>
-        </div>
-
-        }
+            <h2 className="font-bold text-2xl mt-2 text-red-700">
+              {apiStatus.message}
+            </h2>
+            <div className=" max-w-lg bg-gray-900 "></div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ if(data?.backImage&&data?.frontImage){
 
   formData.append("frontImage",data?.frontImage)
   formData.append("backImage",data?.backImage)
-  const response=await axios.post("http://localhost:2000/",formData,{
+  const response=await axios.post("http://localhost:2000/api/upload-images",formData,{
     headers:{
       'Content-Type': "multipart/form-data",
     }

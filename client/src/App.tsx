@@ -25,6 +25,7 @@ const App = () => {
     status: false,
     message: "",
   });
+  let [loading,setLoading]=useState(false)
   let [response, setResponse] = useState({
     name: "",
     dob: "",
@@ -34,40 +35,55 @@ const App = () => {
     pincode: "",
   });
   async function sendImages() {
-    if (data?.backImage && data?.frontImage) {
-      const formData = new FormData();
 
-      formData.append("frontImage", data?.frontImage);
-      formData.append("backImage", data?.backImage);
-      const response = await axios.post(
-        "http://localhost:2000/api/upload-images",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      let apiData=response.data.result
-      setResponse((prev: any) => ({
-        ...prev,
-        name: apiData.name || "Not Found",
-        dob: apiData.dob || "Not Found",
-        gender: apiData.gender || "Not Found",
-        uid: apiData.uid || "Not Found",
-        address: apiData.address || "Not Found",
-        pincode: apiData.pincode || "Not Found",
-      }));
-
-      setApiStatus((prev: any) => ({
-        ...prev,
-        status: response.data.status,
-        message: response.data.message,
-      }));
-      console.log("responce", response.data);
+    try {
+      if (data?.backImage && data?.frontImage) {
+        const formData = new FormData();
+  
+        formData.append("frontImage", data?.frontImage);
+        formData.append("backImage", data?.backImage);
+        setLoading(true)
+        setSubmitButton(true)
+        setApiStatus((prev:any)=>({
+          ...prev,
+          status:false,
+          message:""
+        }))
+        const response = await axios.post(
+          "http://localhost:2000/api/upload-images",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        let apiData=response.data.result
+        setResponse((prev: any) => ({
+          ...prev,
+          name: apiData.name || "Not Found",
+          dob: apiData.dob || "Not Found",
+          gender: apiData.gender || "Not Found",
+          uid: apiData.uid || "Not Found",
+          address: apiData.address || "Not Found",
+          pincode: apiData.pincode || "Not Found",
+        }));
+  
+        setApiStatus((prev: any) => ({
+          ...prev,
+          status: response.data.status,
+          message: response.data.message,
+        }));
+        console.log("responce", response.data);
+      }
+  
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setLoading(false)
+      setSubmitButton(false)
     }
 
-    // setData(response.data)
   }
 
   const [imagePrev, setImagePrev] = useState<ImagePreview>({
@@ -88,12 +104,14 @@ const App = () => {
     setData((perv: any) => ({ ...perv, frontImage: null }));
     setImagePrev((perv) => ({ ...perv, frontPrev: "" }));
   };
+
   const deleteBack = () => {
     backImage.current.value = "";
     URL.revokeObjectURL(imagePrev.backPrev);
     setData((perv: any) => ({ ...perv, backImage: null }));
     setImagePrev((perv) => ({ ...perv, backPrev: "" }));
   };
+
   const updateFront = async () => {
     if (imagePrev.frontPrev) {
       URL.revokeObjectURL(imagePrev.frontPrev);
@@ -105,6 +123,7 @@ const App = () => {
     const prevImage = URL.createObjectURL(frontImage.current.files[0]);
     setImagePrev((prev) => ({ ...prev, frontPrev: prevImage }));
   };
+
   const updateBack = async () => {
     if (imagePrev.backPrev) {
       URL.revokeObjectURL(imagePrev.backPrev);
@@ -188,25 +207,29 @@ const App = () => {
         </div>
 
         <div className="flex justify-center font-bold">
-          <button
+               <button
             className={`bg-blue-500 p-2 w-3xl rounded-md ${
               submitButton ? "cursor-not-allowed" : "cursor-pointer"
             }`}
             disabled={submitButton}
             onClick={sendImages}
           >
-            submit
+            {loading?"Verifying...":"Submit"}
           </button>
         </div>
       </div>
 
       <div className="w-1/2">
-        {!apiStatus.message && (
+
+        {(!apiStatus.message&&!loading) && (
           <div className="mt-4 w-full bg-gray-300 h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center ">
             <h2 className="font-bold text-2xl mt-2">Api Response</h2>
             <div className=" max-w-lg bg-gray-900 "></div>
           </div>
         )}
+        {
+          loading&&<div>Loading</div>
+        }
         {apiStatus.status && (
           <AadhaarResponse
             name={response.name}

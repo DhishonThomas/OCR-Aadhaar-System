@@ -4,4 +4,4 @@ server/node_modules/
 .env
 client/build/
 server/dist/
-server/eng.traineddata
+server/eng.traineddata 

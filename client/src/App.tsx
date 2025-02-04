@@ -1,5 +1,7 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import AadhaarResponse from "./componets/AadhaarResponse";
+import AadhaarJson from "./componets/AadhaarJson";
 
 interface ImagePreview {
   frontPrev: string;
@@ -20,6 +22,22 @@ const App = () => {
   let backImage = useRef<any>(null);
   let [submitButton, setSubmitButton] = useState(true);
 
+  // //{
+  //   "name": "Full Name",
+  //   "dob": "DD/MM/YYYY",
+  //   "gender": "Male/Female/Other",
+  //   "uid": "1234 5678 9012",
+  //   "address": "Extracted Address",
+  //   "pincode": "6-digit Pincode"
+  // }
+  let [response, setResponse] = useState({
+    name: "",
+    dob: "",
+    gender: "",
+    uid: "",
+    address: "",
+    pincode: "",
+  });
   async function sendImages() {
     if (data?.backImage && data?.frontImage) {
       const formData = new FormData();
@@ -38,6 +56,17 @@ const App = () => {
       if (response.data.status) {
         alert("data reached server succssfully.");
       }
+
+      setResponse((prev: any) => ({
+        ...prev,
+        name: response.data.name || "Not Found",
+        dob: response.data.dob || "Not Found",
+        gender: response.data.gender || "Not Found",
+        uid: response.data.uid || "Not Found",
+        address: response.data.address || "Not Found",
+        pincode: response.data.pincode || "Not Found",
+      }));
+
       console.log("responce", response.data);
     }
 
@@ -175,7 +204,19 @@ const App = () => {
         </div>
       </div>
 
-      <div className="w-1/2 p-6">hai</div>
+      <div className="w-1/2">
+        <AadhaarResponse
+          name={response.name}
+          dob={response.dob}
+          gender={response.gender}
+          uid={response.uid}
+          address={response.address}
+          pincode={response.pincode}
+        />
+
+        <AadhaarJson />
+        hai
+      </div>
     </div>
   );
 };

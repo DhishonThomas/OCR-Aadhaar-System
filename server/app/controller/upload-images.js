@@ -18,6 +18,7 @@ export const uploadImages = async (req, res) => {
 
     let status = true;
     for (let key in result) {
+      console.log(key,result[key])
       if (result[key] === "Not Found") {
         status = false;
         break;

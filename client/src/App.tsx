@@ -21,15 +21,10 @@ const App = () => {
   let frontImage = useRef<any>(null);
   let backImage = useRef<any>(null);
   let [submitButton, setSubmitButton] = useState(true);
-
-  // //{
-  //   "name": "Full Name",
-  //   "dob": "DD/MM/YYYY",
-  //   "gender": "Male/Female/Other",
-  //   "uid": "1234 5678 9012",
-  //   "address": "Extracted Address",
-  //   "pincode": "6-digit Pincode"
-  // }
+  let [apiStatus, setApiStatus] = useState<any>({
+    status: false,
+    message: "",
+  });
   let [response, setResponse] = useState({
     name: "",
     dob: "",
@@ -53,20 +48,22 @@ const App = () => {
           },
         }
       );
-      if (response.data.status) {
-        alert("data reached server succssfully.");
-      }
-
+      let apiData=response.data.result
       setResponse((prev: any) => ({
         ...prev,
-        name: response.data.name || "Not Found",
-        dob: response.data.dob || "Not Found",
-        gender: response.data.gender || "Not Found",
-        uid: response.data.uid || "Not Found",
-        address: response.data.address || "Not Found",
-        pincode: response.data.pincode || "Not Found",
+        name: apiData.name || "Not Found",
+        dob: apiData.dob || "Not Found",
+        gender: apiData.gender || "Not Found",
+        uid: apiData.uid || "Not Found",
+        address: apiData.address || "Not Found",
+        pincode: apiData.pincode || "Not Found",
       }));
 
+      setApiStatus((prev: any) => ({
+        ...prev,
+        status: response.data.status,
+        message: response.data.message,
+      }));
       console.log("responce", response.data);
     }
 
@@ -107,7 +104,6 @@ const App = () => {
     }));
     const prevImage = URL.createObjectURL(frontImage.current.files[0]);
     setImagePrev((prev) => ({ ...prev, frontPrev: prevImage }));
-    console.log(prevImage);
   };
   const updateBack = async () => {
     if (imagePrev.backPrev) {
@@ -205,17 +201,35 @@ const App = () => {
       </div>
 
       <div className="w-1/2">
-        <AadhaarResponse
-          name={response.name}
-          dob={response.dob}
-          gender={response.gender}
-          uid={response.uid}
-          address={response.address}
-          pincode={response.pincode}
-        />
+        {!apiStatus.message && (
+          <div className="mt-4 w-full bg-gray-300 h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center ">
+            <h2 className="font-bold text-2xl mt-2">Api Response</h2>
+            <div className=" max-w-lg bg-gray-900 "></div>
+          </div>
+        )}
+        {apiStatus.status && (
+          <AadhaarResponse
+            name={response.name}
+            dob={response.dob}
+            gender={response.gender}
+            uid={response.uid}
+            address={response.address}
+            pincode={response.pincode}
+          />
+        )}
 
-        <AadhaarJson />
-        hai
+        {apiStatus.message && (
+          <AadhaarJson jsonData={JSON.stringify({ response }, null, 2)} />
+        )}
+
+        {
+          (apiStatus.message&&!apiStatus.status)&&
+          <div className="mt-4 w-full bg-gray-300 h-48 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center ">
+          <h2 className="font-bold text-2xl mt-2 text-red-700">{apiStatus.message}</h2>
+          <div className=" max-w-lg bg-gray-900 "></div>
+        </div>
+
+        }
       </div>
     </div>
   );

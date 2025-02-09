@@ -26,6 +26,7 @@ const App = () => {
     status: false,
     message: "",
   });
+  let [error,setError]=useState("")
   let [loading, setLoading] = useState(false);
   let [response, setResponse] = useState({
     name: "",
@@ -111,32 +112,53 @@ const App = () => {
   };
 
   const updateFront = async () => {
-    if (imagePrev.frontPrev) {
-      URL.revokeObjectURL(imagePrev.frontPrev);
-    }
-    setData((prev: any) => ({
-      ...prev,
-      frontImage: frontImage.current.files[0],
-    }));
-    const prevImage = URL.createObjectURL(frontImage.current.files[0]);
-    setImagePrev((prev) => ({ ...prev, frontPrev: prevImage }));
+let file=frontImage.current.files[0]
+if(file&&file.type.startsWith('image/')){
+  if (imagePrev.frontPrev) {
+
+    URL.revokeObjectURL(imagePrev.frontPrev);
+  }
+  setData((prev: any) => ({
+    ...prev,
+    frontImage:file,
+  }));
+  const prevImage = URL.createObjectURL(file);
+  setImagePrev((prev) => ({ ...prev, frontPrev: prevImage }));
+  setError("")
+}else{
+setError("Please select a valid image file (PNG, JPG, JPEG).")
+frontImage.current.value=""
+}
   };
 
   const updateBack = async () => {
-    if (imagePrev.backPrev) {
-      URL.revokeObjectURL(imagePrev.backPrev);
-    }
-    setData((prev: any) => ({
-      ...prev,
-      backImage: backImage.current.files[0],
-    }));
-    const prevImage = URL.createObjectURL(backImage.current.files[0]);
-    setImagePrev((prev) => ({ ...prev, backPrev: prevImage }));
+let file=backImage.current.files[0]
+
+if(file&&file.type.startsWith('image/')){
+  if (imagePrev.backPrev) {
+    URL.revokeObjectURL(imagePrev.backPrev);
+  }
+  setData((prev: any) => ({
+    ...prev,
+    backImage:file,
+  }));
+  const prevImage = URL.createObjectURL(file);
+  setImagePrev((prev) => ({ ...prev, backPrev: prevImage }));
+setError("")
+}else{
+  setError("Please select a valid image file (PNG, JPG, JPEG).")
+  backImage.current.value=""
+}
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
       <div className="w-1/2 p-6 bg-white border-r">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
         <div className="bg-white rounded-lg p-4">
           <p className="text-gray-700 font-medium mb-2">Front Image</p>
           <input
